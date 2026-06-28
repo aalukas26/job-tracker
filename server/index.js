@@ -132,8 +132,8 @@ app.post('/api/applications/:id/interviews', async (req, res) => {
 app.patch('/api/interviews/:id', async (req, res) => {
   try{
     const id = req.params.id;
-    const { scheduled_date, outcome, notes } = req.body;
-    const result = await pool.query('UPDATE interviews SET scheduled_date = COALESCE($1, scheduled_date), outcome = COALESCE($2, outcome), notes = COALESCE($3,  notes) WHERE id = $4 RETURNING *', [scheduled_date, outcome, notes, id]);
+    const { type, scheduled_date, outcome, notes } = req.body;
+    const result = await pool.query('UPDATE interviews SET type = COALESCE($1, type), scheduled_date = COALESCE($2, scheduled_date), outcome = COALESCE($3, outcome), notes = COALESCE($4,  notes) WHERE id = $5 RETURNING *', [type, scheduled_date, outcome, notes, id]);
     res.json(result.rows[0]);
   } catch(err) {
     console.log(err);
@@ -142,7 +142,7 @@ app.patch('/api/interviews/:id', async (req, res) => {
 });
 /* command to test patch route for interviews
  curl -X PATCH http://localhost:3001/api/interviews/1 -H "Content-Type: application/json" -d '{"scheduled_date": "2026-07-02", "outcome": "failed"}'
- curl -X PATCH http://localhost:3001/api/interviews/2 -H "Content-Type: application/json" -d '{"outcome:" "passed"}'
+ curl -X PATCH http://localhost:3001/api/interviews/2 -H "Content-Type: application/json" -d '{"outcome": "passed"}'
  */
 
 

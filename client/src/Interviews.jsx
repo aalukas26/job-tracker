@@ -10,6 +10,11 @@ function Interviews({applicationId}) {
     const [notes, setNotes] = useState('');
     const [showForm, setShowForm] = useState(false);    //determines whether the form fields show up or not
 
+    const [editId, setEditId] = useState(null);
+    const [editType, setEditType] = useState('');
+    const [editDate, setEditDate] = useState('');
+    const [editOutcome, setEditOutcome] = useState('');
+    const [editNotes, setEditNotes] = useState('');
 
     //fetch all interviews for this application
     const getInterviews = async () => {
@@ -53,6 +58,52 @@ function Interviews({applicationId}) {
     };
 
 
+    //edit an interview
+    //store interview id and prefill fields with current data
+    const startEditing = (interview) => {
+        setEditId(interview.id);
+        setEditType(interview.type);
+        setEditDate(interview.scheduled_date?.slice(0,10));
+        setEditOutcome(interview.outcome);
+        setEditNotes(interview.notes || '');
+    };
+
+    const handleEdit = async (e) => {
+        e.preventDefault();
+        try {
+            const response = await fetch(`http://localhost:3001/api/interviews/${editId}`, {
+                method: 'PATCH',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({type: editType, scheduled_date: editDate, outcome: editOutcome, notes: editNotes})
+            });
+
+            if(!response.ok) {
+                throw new Error('Failed to edit interview');
+            }
+            await getInterviews();
+            setEditId(null);    //reset 'interview to edit' id
+        } catch(err) {
+            console.log(err);
+        }
+    };
+
+
+    //delete an interview
+    const handleDelete = async (id) => {
+        try {
+            const response = await fetch(`http://localhost:3001/api/interviews/${id}`, {
+                method: 'DELETE'
+            });
+            if(!response.ok) {
+                throw new Error('Failed to delete interview');
+            }
+            await getInterviews();
+        } catch(err) {
+            console.log(err);
+        }
+    };
+
+
   useEffect(() => {
     getInterviews();
   }, []);
@@ -64,15 +115,53 @@ function Interviews({applicationId}) {
             <ul>
                 {interviews.map((interview) => (
                 <li key={interview.id}>
-                    Round {interview.round_number} - {interview.type}
-                    <br/>
-                    Date: {new Date(interview.scheduled_date).toLocaleDateString()} | Outcome: {interview.outcome}
-                    {interview.notes && (
+                    <>
+                    {interview.id === editId ? (
+                        //show edit form
+                        <form onSubmit={handleEdit}>
+                            <input
+                                value={editType}
+                                onChange={(e) => setEditType(e.target.value)}
+                                placeholder='Type:'
+                            />
+                            <input
+                                value={editDate}
+                                onChange={(e) => setEditDate(e.target.value)}
+                                placeholder='Scheduled Date:'
+                            />
+                            <input
+                                value={editOutcome}
+                                onChange={(e) => setEditOutcome(e.target.value)}
+                                placeholder='Outcome:'
+                            />
+                            <input
+                                value={editNotes}
+                                onChange={(e) => setEditNotes(e.target.value)}
+                                placeholder='Notes:'
+                            />
+                            <button type='submit'>Save</button>
+                        </form>          
+
+                    ) : (
+                        //existing normal display plus edit button
                         <>
-                            <br />
-                            Notes: {interview.notes}
+                        Round {interview.round_number} - {interview.type}
+                        <br/>
+                        Date: {new Date(interview.scheduled_date).toLocaleDateString()} | Outcome: {interview.outcome}
+                        {interview.notes && (
+                            <>
+                                <br />
+                                Notes: {interview.notes}
+                            </>
+                        )}
+                        <br/>
+                        <button onClick={() => startEditing(interview)}>Edit</button>
+                        <button className='delete-button' onClick={() => handleDelete(interview.id)}>Delete</button>
+
                         </>
-                    )}
+                    )
+                    }
+                    </>
                 </li>
                 ))}
             </ul>  
