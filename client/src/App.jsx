@@ -1,4 +1,5 @@
 import './App.css'
+import Interviews from './Interviews'
 import {useState, useEffect} from 'react'
 
 function App() {
@@ -8,6 +9,7 @@ function App() {
   const [location, setLocation] = useState('');
   const [salary, setSalary] = useState('');
   const [url, setUrl] = useState('');
+  const [showForm, setShowForm] = useState(false);
 
   
   //fetch all applications
@@ -45,12 +47,14 @@ function App() {
       }
       await getApplications();
 
-      //clear out form input fields after submit
+      //clear out form input fields and toggle the form visibility off after submit
       setCompany('');
       setRole('');
       setLocation('');
       setSalary('');
       setUrl('');
+      setShowForm(false);
+
     } catch(err) {
       console.log(err);
     }
@@ -97,13 +101,14 @@ function App() {
   return (
     <div className="App">
       <h1>Job Tracker</h1>
-      <ul>
+      <ul className='applications-list'>
         {applications.map((app) => (
           <li key={app.id}>
             <strong>{app.company}</strong> — {app.role} ({app.location})
             <br />
             Status: {app.status} | Salary: {app.salary}
-            <button onClick={() => handleDelete(app.id)}>Delete</button>
+            <Interviews applicationId={app.id}/>
+            <button className='delete-button' onClick={() => handleDelete(app.id)}>Delete</button>
             <select value={app.status} onChange={(e) => handleStatusChange(app.id,e.target.value)}>
               <option value='applied'>Applied</option>
               <option value='interviewing'>Interviewing</option>
@@ -115,7 +120,13 @@ function App() {
         ))}
       </ul>
 
+    {/* only show the button to add submit, not form fields*/}
+    {!showForm && (
+      <button onClick={() => setShowForm(true)}>Add Application</button>
+    )}
 
+    {/* show both the button and the form fields*/}
+    {showForm && (
       <form onSubmit={handleSubmit}>
         <input
           value={company}
@@ -144,6 +155,7 @@ function App() {
         />
         <button type='submit'>Add Application</button>
       </form>
+    )}
       
     </div>
   )

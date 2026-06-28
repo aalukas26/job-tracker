@@ -14,7 +14,7 @@ ul {
   gap: 12px;
 }
 
-li {
+.applications-list li {
   border: 1px solid var(--border);
   border-radius: 8px;
   padding: 16px;
@@ -54,4 +54,16 @@ button {
 
 button:hover {
   background: var(--accent-border);
+}
+
+.delete-button {
+  border-color: #a93226;
+  background: #c0392b;
+  color: #fff;
+  padding: 4px 10px;
+  font-size: 0.85em;
+}
+
+.delete-button:hover {
+  background: #e74c3c;
 }
