@@ -123,6 +123,11 @@ function App() {
             <div className='app-details'>
               <span className='status-pill'>{app.status}</span>
               <span>Salary: {app.salary}</span>
+              {app.url && (
+                <a href={app.url} target='_blank' rel='noopener noreferrer'>
+                  Job Posting
+                </a>
+              )}
             </div>
             <div className='app-actions'>
               <select value={app.status} onChange={(e) => handleStatusChange(app.id,e.target.value)}>

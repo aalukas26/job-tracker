@@ -92,6 +92,16 @@ ul {
   color: var(--text-muted);
 }
 
+.app-details a {
+  color: var(--accent);
+  text-decoration: none;
+  border-bottom: 1px solid var(--accent-soft);
+}
+
+.app-details a:hover {
+  border-bottom-color: var(--accent);
+}
+
 .status-pill {
   font-family: var(--font-heading);
   font-size: 11px;
