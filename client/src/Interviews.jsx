@@ -16,8 +16,12 @@ function Interviews({applicationId}) {
     const [editOutcome, setEditOutcome] = useState('');
     const [editNotes, setEditNotes] = useState('');
 
+  const [error, setError] = useState(null);
+
+
     //fetch all interviews for this application
     const getInterviews = async () => {
+        setError(null);
         try {
             const response = await fetch(`http://localhost:3001/api/applications/${applicationId}/interviews`);
             if (!response.ok) {
@@ -27,6 +31,7 @@ function Interviews({applicationId}) {
             setInterviews(result);
         } catch(err) {
             console.log(err);
+            setError('Failed to load interviews');
         }
     };
 
@@ -34,6 +39,7 @@ function Interviews({applicationId}) {
     //add a new interview to an application
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setError(null);
         try {
             const response = await fetch(`http://localhost:3001/api/applications/${applicationId}/interviews`, {
                 method: 'POST',
@@ -54,6 +60,7 @@ function Interviews({applicationId}) {
             setShowForm(false);
         } catch(err) {
             console.log(err);
+            setError('Failed to add interview');
         }
     };
 
@@ -70,6 +77,7 @@ function Interviews({applicationId}) {
 
     const handleEdit = async (e) => {
         e.preventDefault();
+        setError(null);
         try {
             const response = await fetch(`http://localhost:3001/api/interviews/${editId}`, {
                 method: 'PATCH',
@@ -84,12 +92,14 @@ function Interviews({applicationId}) {
             setEditId(null);    //reset 'interview to edit' id
         } catch(err) {
             console.log(err);
+            setError('Failed to edit interview');
         }
     };
 
 
     //delete an interview
     const handleDelete = async (id) => {
+        setError(null);
         try {
             const response = await fetch(`http://localhost:3001/api/interviews/${id}`, {
                 method: 'DELETE'
@@ -100,6 +110,7 @@ function Interviews({applicationId}) {
             await getInterviews();
         } catch(err) {
             console.log(err);
+            setError('Failed to delete interview');
         }
     };
 
@@ -111,8 +122,9 @@ function Interviews({applicationId}) {
 
 
     return (
-        <div>
-            <ul>
+        <div className='interviews-wrapper'>
+            {error && <p className="error-message">{error}</p>}
+            <ul className='interview-list'>
                 {interviews.map((interview) => (
                 <li key={interview.id}>
                     <>
@@ -123,11 +135,13 @@ function Interviews({applicationId}) {
                                 value={editType}
                                 onChange={(e) => setEditType(e.target.value)}
                                 placeholder='Type:'
+                                required
                             />
                             <input
                                 value={editDate}
                                 onChange={(e) => setEditDate(e.target.value)}
                                 placeholder='Scheduled Date:'
+                                required
                             />
                             <input
                                 value={editOutcome}
@@ -140,31 +154,27 @@ function Interviews({applicationId}) {
                                 placeholder='Notes:'
                             />
                             <button type='submit'>Save</button>
-                        </form>          
+                        </form>
 
                     ) : (
                         //existing normal display plus edit button
                         <>
-                        Round {interview.round_number} - {interview.type}
-                        <br/>
-                        Date: {new Date(interview.scheduled_date).toLocaleDateString()} | Outcome: {interview.outcome}
+                        <span className='interview-round'>Round {interview.round_number} — {interview.type}</span>
+                        <span>{new Date(interview.scheduled_date).toLocaleDateString()} · Outcome: {interview.outcome}</span>
                         {interview.notes && (
-                            <>
-                                <br />
-                                Notes: {interview.notes}
-                            </>
+                            <span>Notes: {interview.notes}</span>
                         )}
-                        <br/>
-                        <button onClick={() => startEditing(interview)}>Edit</button>
-                        <button className='delete-button' onClick={() => handleDelete(interview.id)}>Delete</button>
-
+                        <div className='app-actions'>
+                            <button className='edit-button' onClick={() => startEditing(interview)}>Edit</button>
+                            <button className='delete-button' onClick={() => handleDelete(interview.id)}>Delete</button>
+                        </div>
                         </>
                     )
                     }
                     </>
                 </li>
                 ))}
-            </ul>  
+            </ul>
 
         {/*conditionally render either the button or the form, so input fields aren't unnecessarily being shown */}
         {/* show only the button */}
@@ -179,11 +189,13 @@ function Interviews({applicationId}) {
                     value={type}
                     onChange={(e) => setType(e.target.value)}
                     placeholder='Type:'
+                    required
                 />
                 <input
                     value={scheduled_date}
                     onChange={(e) => setScheduledDate(e.target.value)}
                     placeholder='Scheduled Date:'
+                    required
                 />
                 <input
                     value={outcome}

@@ -10,10 +10,12 @@ function App() {
   const [salary, setSalary] = useState('');
   const [url, setUrl] = useState('');
   const [showForm, setShowForm] = useState(false);
+  const [error, setError] = useState(null);
 
   
   //fetch all applications
   const getApplications = async () => {
+    setError(null);
     try {
       const response = await fetch('http://localhost:3001/api/applications');
       if (!response.ok) {
@@ -23,6 +25,7 @@ function App() {
       setApplications(result);
     } catch(err) {
         console.log(err);
+        setError('Failed to load applications');
     }
   };
 
@@ -35,6 +38,7 @@ function App() {
   //add a new application
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError(null);
     try {
       const response = await fetch('http://localhost:3001/api/applications', {
         method: 'POST',
@@ -57,12 +61,14 @@ function App() {
 
     } catch(err) {
       console.log(err);
+      setError('Failed to add application');
     }
   };
 
 
   //delete an application
   const handleDelete = async (id) => {
+    setError(null);
     try {
       const response = await fetch(`http://localhost:3001/api/applications/${id}`, {
         method: 'DELETE'
@@ -74,12 +80,14 @@ function App() {
       await getApplications();
     } catch(err) {
       console.log(err);
+      setError('Failed to delete application');
     }
   };
 
   
   //update an application
   const handleStatusChange = async (id, newStatus) => {
+    setError(null);
     try {
       const response = await fetch(`http://localhost:3001/api/applications/${id}`, {
         method: 'PATCH',
@@ -92,6 +100,7 @@ function App() {
       await getApplications();
     } catch(err) {
       console.log(err);
+      setError('Failed to update application status');
     }
   };
 
@@ -101,21 +110,31 @@ function App() {
   return (
     <div className="App">
       <h1>Job Tracker</h1>
+      {error && <p className="error-message">{error}</p>}
       <ul className='applications-list'>
-        {applications.map((app) => (
-          <li key={app.id}>
-            <strong>{app.company}</strong> — {app.role} ({app.location})
-            <br />
-            Status: {app.status} | Salary: {app.salary}
+        {applications.map((app, index) => (
+          <li
+            key={app.id}
+            className={`status-${app.status}`}
+            style={{ animationDelay: `${index * 60}ms` }}
+          >
+            <span className='app-company'>{app.company}</span>
+            <span className='app-meta'>{app.role} — {app.location}</span>
+            <div className='app-details'>
+              <span className='status-pill'>{app.status}</span>
+              <span>Salary: {app.salary}</span>
+            </div>
+            <div className='app-actions'>
+              <select value={app.status} onChange={(e) => handleStatusChange(app.id,e.target.value)}>
+                <option value='applied'>Applied</option>
+                <option value='interviewing'>Interviewing</option>
+                <option value='rejected'>Rejected</option>
+                <option value='offer'>Offer Received</option>
+                <option value='accepted'>Accepted</option>
+              </select>
+              <button className='delete-button' onClick={() => handleDelete(app.id)}>Delete</button>
+            </div>
             <Interviews applicationId={app.id}/>
-            <button className='delete-button' onClick={() => handleDelete(app.id)}>Delete</button>
-            <select value={app.status} onChange={(e) => handleStatusChange(app.id,e.target.value)}>
-              <option value='applied'>Applied</option>
-              <option value='interviewing'>Interviewing</option>
-              <option value='rejected'>Rejected</option>
-              <option value='offer'>Offer Received</option>
-              <option value='accepted'>Accepted</option>
-            </select>
           </li>
         ))}
       </ul>
@@ -132,11 +151,13 @@ function App() {
           value={company}
           onChange={(e) => setCompany(e.target.value)}
           placeholder='Company:'
+          required
         />
         <input
           value={role}
           onChange={(e) => setRole(e.target.value)}
           placeholder='Role:'
+          required
         />
         <input
           value={location}

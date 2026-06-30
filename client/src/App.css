@@ -1,69 +1,238 @@
 .App {
-  max-width: 700px;
+  max-width: 1180px;
   margin: 0 auto;
-  padding: 24px;
+  padding: 56px 24px 96px;
   text-align: left;
+}
+
+.applications-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  align-items: start;
+}
+
+.App h1 {
+  font-size: 42px;
+  letter-spacing: -0.5px;
+  font-style: italic;
+  margin-bottom: 36px;
+  border-bottom: 2px solid var(--border);
+  padding-bottom: 18px;
 }
 
 ul {
   list-style: none;
   padding: 0;
-  margin: 0 0 32px;
+  margin: 0 0 28px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .applications-list li {
+  background: var(--bg-card);
   border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 16px;
+  border-left: 5px solid var(--gray);
+  border-radius: 3px;
+  padding: 20px 22px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
+  box-shadow: var(--shadow);
+  opacity: 0;
+  animation: rise-in 0.5s ease forwards;
+}
+
+.applications-list li.status-applied {
+  border-left-color: var(--gray);
+}
+.applications-list li.status-interviewing {
+  border-left-color: var(--gold);
+}
+.applications-list li.status-offer {
+  border-left-color: var(--green);
+}
+.applications-list li.status-accepted {
+  border-left-color: var(--accent);
+}
+.applications-list li.status-rejected {
+  border-left-color: var(--rust);
+}
+
+.app-company {
+  font-family: var(--font-heading);
+  font-size: 21px;
+  font-weight: 600;
+  color: var(--text-h);
+}
+
+.app-meta {
+  color: var(--text-muted);
+  font-size: 15px;
+  font-style: italic;
+}
+
+.app-details {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.status-pill {
+  font-family: var(--font-heading);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--bg-inset);
+  color: var(--text);
+}
+
+.app-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 4px;
 }
 
 form {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  border-top: 1px solid var(--border);
+  max-width: 480px;
+  border-top: 2px solid var(--border);
   padding-top: 24px;
+  margin-top: 8px;
 }
 
 input,
 select {
   font: inherit;
-  padding: 8px 10px;
+  padding: 9px 12px;
   border: 1px solid var(--border);
-  border-radius: 6px;
-  background: var(--bg);
+  border-radius: 4px;
+  background: var(--bg-card);
   color: var(--text-h);
+}
+
+input:focus,
+select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
 }
 
 button {
   font: inherit;
-  padding: 8px 14px;
-  border-radius: 6px;
-  border: 1px solid var(--accent-border);
-  background: var(--accent-bg);
-  color: var(--accent);
+  font-family: var(--font-heading);
+  font-weight: 600;
+  padding: 9px 16px;
+  border-radius: 4px;
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: var(--bg-card);
   cursor: pointer;
   align-self: flex-start;
+  transition: background 0.15s ease, transform 0.1s ease;
 }
 
 button:hover {
-  background: var(--accent-border);
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+}
+
+button:active {
+  transform: translateY(1px);
 }
 
 .delete-button {
-  border-color: #a93226;
-  background: #c0392b;
-  color: #fff;
-  padding: 4px 10px;
-  font-size: 0.85em;
+  border-color: var(--rust);
+  background: var(--bg-card);
+  color: var(--rust);
+  padding: 5px 12px;
+  font-size: 0.82em;
 }
 
 .delete-button:hover {
-  background: #e74c3c;
+  background: var(--rust);
+  border-color: var(--rust);
+  color: var(--bg-card);
+}
+
+.edit-button {
+  border-color: var(--gold);
+  background: var(--bg-card);
+  color: var(--gold);
+  padding: 5px 12px;
+  font-size: 0.82em;
+}
+
+.edit-button:hover {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: var(--bg-card);
+}
+
+.error-message {
+  font-family: var(--font-body);
+  font-style: italic;
+  color: var(--rust-hover);
+  background: var(--rust-soft);
+  border-left: 3px solid var(--rust);
+  padding: 10px 14px;
+  margin-bottom: 20px;
+  border-radius: 2px;
+}
+
+/* interviews (nested within an application card) */
+
+.interviews-wrapper {
+  border-top: 1px dashed var(--border);
+  margin-top: 4px;
+  padding-top: 12px;
+}
+
+.interview-list {
+  margin: 0 0 10px;
+  gap: 8px;
+}
+
+.interview-list li {
+  background: var(--bg-inset);
+  border: none;
+  border-left: 3px solid var(--border);
+  border-radius: 2px;
+  padding: 10px 14px;
+  font-size: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.interview-round {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  color: var(--text-h);
+}
+
+.interview-list form {
+  border-top: none;
+  padding-top: 8px;
+  margin-top: 0;
 }
